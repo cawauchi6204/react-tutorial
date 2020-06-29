@@ -32,25 +32,39 @@ class Board extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            squeares: Array(9).fill(null),
-            xIsNext:true
+            squares: Array(9).fill(null),
+            xIsNext: true,
         }
     }
     handleClick(i) {
         const squares = this.state.squares.slice();
-        squares[i] = 'X';
-        this.setState({ squares: squares });
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
+        squares[i] = this.state.xIsNext ? 'X' : 'O';
+        this.setState({
+            squares: squares,
+            xIsNext: !this.state.xIsNext,
+        });
     }
     renderSquare(i) {
         return <Square
-            value={this.state.squeares[i]}
+            value={this.state.squares[i]}
             onClick={() => this.handleClick(i)}
         />;
     }
 
     render() {
-        const status = 'Next player: X';
-
+        const winner =
+            calculateWinner(this.state.squares);
+            //winnerにはsquares[a]が入ってくる。つまり'X' or 'O'が入ってくる
+        let status;
+        if (winner) {
+            status = 'Winner:' + winner;
+            //'X' or 'O'を表示する
+        } else {
+            status = 'Next player:' + (this.state.xIsNext ? 'X' : 'O');
+        }
         return (
             <div>
                 <div className="status">{status}</div>
@@ -88,6 +102,38 @@ class Game extends React.Component {
             </div>
         );
     }
+}
+
+function calculateWinner(squares) {
+    //勝利条件
+    const lines = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 6, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
+    for (let i = 0; i < lines.length; i++) {
+        //lines(二次元配列)の数だけfor文を回して[a,b,c]に代入している
+
+        const [a, b, c] = lines[i];
+        //分割代入 (Destructuring assignment) 構文は、配列から値を取り出して、あるいはオブジェクトからプロパティを取り出して別個の変数に代入することを可能にする JavaScriptの式
+
+        if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            //squaresが完全に揃っている場合、squares[a]を返す
+            return squares[a];
+            //なぜcalculateWinner関数にsquares[a]を返すのかわからない
+        }
+        //このロジックの理解が浅い
+    }
+
+    return null;
+    //9つのsquareの配列が与えられると、この関数は勝者がいるか適切に確認し、'X' か 'O'、あるいは null を返します。
+    //->値が格納されれば勝者が誰かわかる＆まだわからない場合はnullを返すということ
 }
 
 // ========================================
