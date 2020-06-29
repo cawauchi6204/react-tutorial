@@ -38,6 +38,9 @@ class Board extends React.Component {
     }
     handleClick(i) {
         const squares = this.state.squares.slice();
+        if (calculateWinner(squares) || squares[i]) {
+            return;
+        }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
         this.setState({
             squares: squares,
@@ -54,9 +57,11 @@ class Board extends React.Component {
     render() {
         const winner =
             calculateWinner(this.state.squares);
+            //winnerにはsquares[a]が入ってくる。つまり'X' or 'O'が入ってくる
         let status;
         if (winner) {
             status = 'Winner:' + winner;
+            //'X' or 'O'を表示する
         } else {
             status = 'Next player:' + (this.state.xIsNext ? 'X' : 'O');
         }
@@ -113,14 +118,22 @@ function calculateWinner(squares) {
     ];
 
     for (let i = 0; i < lines.length; i++) {
-        //linesの数だけfor文を回して[a,b,c]に代入している
+        //lines(二次元配列)の数だけfor文を回して[a,b,c]に代入している
+
         const [a, b, c] = lines[i];
+        //分割代入 (Destructuring assignment) 構文は、配列から値を取り出して、あるいはオブジェクトからプロパティを取り出して別個の変数に代入することを可能にする JavaScriptの式
+
         if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
+            //squaresが完全に揃っている場合、squares[a]を返す
             return squares[a];
+            //なぜcalculateWinner関数にsquares[a]を返すのかわからない
         }
+        //このロジックの理解が浅い
     }
+
     return null;
-    //この文の理解が浅い
+    //9つのsquareの配列が与えられると、この関数は勝者がいるか適切に確認し、'X' か 'O'、あるいは null を返します。
+    //->値が格納されれば勝者が誰かわかる＆まだわからない場合はnullを返すということ
 }
 
 // ========================================
